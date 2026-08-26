@@ -53,6 +53,12 @@ header h1 {
     color: #777;
     font-size: 14px;
 }
+
+.news a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: bold;
+}
 </style>
 </head>
 
@@ -60,33 +66,51 @@ header h1 {
 
 <header>
     <h1>خبر سريع</h1>
-    <p>آخر الأخبار في مكان واحد</p>
+    <p>آخر الأخبار العالمية</p>
 </header>
 
 <div class="breaking">
-    🔴 أخبار عاجلة
+    🔴 آخر الأخبار
 </div>
 
-<div class="container">
-
-    <div class="news">
-        <h2>أول خبر في موقعنا</h2>
-        <div class="time">منذ قليل</div>
-        <p>
-            هذا خبر تجريبي. لاحقًا سنربط الموقع بمصدر الأخبار
-            ليتم عرض الأخبار الحقيقية تلقائيًا.
-        </p>
-    </div>
-
-    <div class="news">
-        <h2>خبر جديد</h2>
-        <div class="time">اليوم</div>
-        <p>
-            موقع الأخبار الخاص بنا أصبح جاهزًا كبداية.
-        </p>
-    </div>
-
+<div class="container" id="news">
+    جارٍ تحميل الأخبار...
 </div>
+
+<script>
+const API = "https://khabar-api.lwsylfr78.workers.dev/news";
+
+async function loadNews() {
+    const container = document.getElementById("news");
+
+    try {
+        const response = await fetch(API);
+        const data = await response.json();
+
+        if (!data.articles || data.articles.length === 0) {
+            container.innerHTML = "<p>لا توجد أخبار حاليًا.</p>";
+            return;
+        }
+
+        container.innerHTML = data.articles.map(article => `
+            <div class="news">
+                <h2>${article.title || "بدون عنوان"}</h2>
+                <div class="time">${article.publishedAt || ""}</div>
+                <p>${article.description || "لا يوجد وصف للخبر."}</p>
+                <a href="${article.url}" target="_blank">
+                    اقرأ الخبر كاملًا
+                </a>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        container.innerHTML =
+            "<p>حدث خطأ أثناء تحميل الأخبار.</p>";
+    }
+}
+
+loadNews();
+</script>
 
 </body>
 </html>
